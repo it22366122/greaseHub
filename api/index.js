@@ -13,6 +13,9 @@ mongoose.connect(process.env.dbURL).then(() => {
 }).catch((err)=> {console.log(err);});
 
 const app = express();
+app.use(express.json());  //allow json inputs to the server
+
+
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });
