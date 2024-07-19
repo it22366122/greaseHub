@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -28,7 +29,8 @@ export default function Signup() {
       }
 
       const data = await res.json();
-      console.log(data);
+      window.alert('Registration Successfull ! Please Sign In to continue.')
+      navigate("/signin")
       
     } catch (error) {
       console.error("Error submitting form:", error);
