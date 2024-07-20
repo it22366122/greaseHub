@@ -1,15 +1,42 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Signin() {
-  const handleChange = (e) => {};
+  const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+  const submitData = async (e) => {
+    try {
+      e.preventDefault();
+
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      console.log(data);
+
+      navigate("/"); // Use navigate to redirect to "/"
+    } catch (error) {
+      console.log(error);
+      window.alert("Username or password is incorrect")
+    }
+  };
 
   return (
     <div className="flex flex-col w-full max-w-md mx-auto p-4 bg-white shadow-lg rounded-lg">
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
         Sign In
       </h1>
-      <form className="flex flex-col gap-6">
+      <form className="flex flex-col gap-6" onSubmit={submitData}>
         <input
           className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           type="text"
