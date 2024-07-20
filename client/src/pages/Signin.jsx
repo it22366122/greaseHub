@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { signInStart,signInScuccess,signInFailure } from "../redux/user/userSlice";
+import { useSelector } from "react-redux";
 
 export default function Signin() {
   const [formData, setFormData] = useState({});
+  const {loading, error} = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -14,6 +22,8 @@ export default function Signin() {
     try {
       e.preventDefault();
 
+      dispatch(signInStart());
+
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
@@ -23,10 +33,22 @@ export default function Signin() {
       });
       const data = await res.json();
       console.log(data);
+      if (data.success === false) {
+        dispatch(signInFailure(data.message));
+        window.alert(data.message);
+        return;
+      }
 
+      dispatch(signInScuccess(data));
       navigate("/"); // Use navigate to redirect to "/"
-    } catch (error) {
-      console.log(error);
+
+      
+    }
+
+
+    
+    catch (error) {
+      dispatch(signInFailure(error.message));
       window.alert("Username or password is incorrect")
     }
   };
