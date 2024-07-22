@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { signInStart,signInScuccess,signInFailure } from "../redux/user/userSlice";
+import {
+  signInStart,
+  signInScuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 import { useSelector } from "react-redux";
+
+import Oauth from "../components/Oauth";
 
 export default function Signin() {
   const [formData, setFormData] = useState({});
-  const {loading, error} = useSelector((state) => state.user);
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-
 
   const handleChange = (e) => {
     setFormData({
@@ -41,15 +45,9 @@ export default function Signin() {
 
       dispatch(signInScuccess(data));
       navigate("/"); // Use navigate to redirect to "/"
-
-      
-    }
-
-
-    
-    catch (error) {
+    } catch (error) {
       dispatch(signInFailure(error.message));
-      window.alert("Username or password is incorrect")
+      window.alert("Username or password is incorrect");
     }
   };
 
@@ -89,6 +87,7 @@ export default function Signin() {
         >
           Sign In
         </button>
+        <Oauth />
       </form>
       <div>
         <p className="font-mono p-6">

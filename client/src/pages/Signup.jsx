@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link,useNavigate } from "react-router-dom";
+import Oauth from "../components/Oauth";
 
 export default function Signup() {
   const [formData, setFormData] = useState({});
@@ -91,6 +92,7 @@ export default function Signup() {
         >
           Sign Up
         </button>
+        <Oauth /> 
       </form>
       <div>
         <p className="font-mono p-6">
