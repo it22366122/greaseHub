@@ -2,11 +2,39 @@
 import React from "react";
 import logo from "../images/logo.jpeg";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { Avatar, Dropdown } from "flowbite-react";
+import { signOutUserFailure, signOutUserStart, signOutUserSuccess } from "../redux/user/userSlice";
 
 export default function Header() {
   const currentUser = useSelector((state) => state.user.currentUser);
+  const dispatch = useDispatch()
+
+  const handleSignout = async () => {
+    try {
+      dispatch(signOutUserStart());
+      const res = await fetch("api/auth/signout");
+
+      if (!res.ok) {
+        dispatch(signOutUserFailure());
+        console.error("Failed to sign out:", res.status, res.statusText);
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.success === false) {
+        dispatch(signOutUserFailure());
+        console.error("Sign out error:", data.message);
+        return;
+      }
+
+      dispatch(signOutUserSuccess());
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      dispatch(signOutUserFailure());
+    }
+  };
 
  
 
@@ -64,7 +92,7 @@ export default function Header() {
                 <Dropdown.Item>Profile</Dropdown.Item>
               </Link>
               <Dropdown.Divider></Dropdown.Divider>
-              <Dropdown.Item className="text-red-500">Sign Out</Dropdown.Item>
+              <Dropdown.Item className="text-red-500" onClick={handleSignout}>Sign Out</Dropdown.Item>
             </Dropdown>
           ) : (
             <Link to="/signin">

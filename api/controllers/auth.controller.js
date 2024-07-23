@@ -49,6 +49,21 @@ catch (error) {
 
 }
 
+
+export const signout = async (req, res, next) => {
+  try {
+    res.clearCookie("token"); // Assuming 'token' is the name of the cookie
+    res.status(200).json({ message: "Signout Successful!" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+
+
+
 export const google = async (req, res, next) => {
   try {
     // Find user by email
