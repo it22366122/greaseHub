@@ -2,7 +2,6 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import errorHandler from "../utils/error.js";
 import jwt from "jsonwebtoken";
-import exp from "constants";
 
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -38,6 +37,7 @@ export const signin = async (req, res, next) => {
     }
 
     const token = jwt.sign({id: validUser._id}, process.env.JWT_SECRET);
+    
     res.cookie("token", token, {httpOnly: true}).status(200).json(validUser);
 
     
@@ -51,28 +51,36 @@ catch (error) {
 
 export const google = async (req, res, next) => {
   try {
-    const user = await User.findOne({email: req.body.email});
-    if(user){
-      const token = jwt.sign({id: user._id}, process.env.JWT_SECRET);
-      const {password:pass ,...rest} = user._doc;
+    // Find user by email
+    const user = await User.findOne({ email: req.body.email });
 
-      res.cookie("token", token, {httpOnly: true}).status(200).json(user);
-      
-    }
-    else{
+    if (user) {
+      // If user exists, generate a token
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+      // Destructure to omit the password from the response
+      const { password, ...rest } = user._doc;
+
+      // Set cookie and send response
+      res.cookie("token", token, { httpOnly: true }).status(200).json(rest);
+    } else {
+      // If user does not exist, create a new one
       const pass = Math.random().toString(36).slice(-8);
       const hashedPassword = await bcrypt.hash(pass, 10);
-      const newUser = new User({username: req.body.name.split(" ").join("").toLowerCase(), email: req.body.email, password: hashedPassword, photo: req.body.photo});
+      const newUser = new User({
+        username: req.body.name.split(" ").join("").toLowerCase(),
+        email: req.body.email,
+        password: hashedPassword,
+        photo: req.body.photo,
+      });
       await newUser.save();
-      const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRET);
-      res.cookie("token", token, {httpOnly: true}).status(200).json(newUser);
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+
+      const { password, ...rest } = newUser._doc;
+
+      res.cookie("token", token, { httpOnly: true }).status(200).json(rest);
     }
-
-
-
-    
   } catch (error) {
-    next(error)
-    
+    next(error);
   }
-}
+};
